@@ -1,12 +1,27 @@
 """Generates a random semantically-unrelated label."""
 import os
+import pickle
 import random
 import urllib.request
-import utils
 
 
 WORDS_URL_SHORT = 'https://www.mit.edu/~ecprice/wordlist.10000'
 WORDS_URL_LONG = 'https://www.mit.edu/~ecprice/wordlist.100000'
+
+
+def save_pickle(filename, data):
+  if os.path.exists(filename):
+    print(f'WARNING: PICKLE ALREADY EXISTS AT {filename}, CONTINUING')
+    return
+
+  with open(filename, 'wb') as file:
+    pickle.dump(data, file, pickle.HIGHEST_PROTOCOL)
+    print(f'Saved pickle at {filename}')
+
+
+def load_pickle(filename):
+  with open(filename, 'rb') as file:
+    return pickle.load(file)
 
 
 def random_words():
@@ -14,9 +29,9 @@ def random_words():
   if os.path.exists('random_words_10000.pickle') and os.path.exists(
       'random_words_100000.pickle'
   ):
-    return utils.load_pickle(
+    return load_pickle(
         'random_words_10000.pickle'
-    ), utils.load_pickle('random_words_100000.pickle')
+    ), load_pickle('random_words_100000.pickle')
   else:
     short_response = urllib.request.urlopen(WORDS_URL_SHORT)
     long_response = urllib.request.urlopen(WORDS_URL_LONG)
@@ -24,8 +39,8 @@ def random_words():
     long_txt = long_response.read().decode()
     short_words = short_txt.splitlines()
     long_words = long_txt.splitlines()
-    utils.save_pickle('random_words_10000.pickle', short_words)
-    utils.save_pickle('random_words_100000.pickle', long_words)
+    save_pickle('random_words_10000.pickle', short_words)
+    save_pickle('random_words_100000.pickle', long_words)
     return short_words, long_words
 
 
